@@ -6,6 +6,21 @@ import (
 	"strconv"
 )
 
+func helper(i *int, input string, num string) (output string, err error) {
+	for string(input[*i]) != " " && string(input[*i]) != "-" && string(input[*i]) != "+" {
+		_, err := strconv.Atoi(string(input[*i]))
+		if err != nil {
+			return "", fmt.Errorf("Forbidden symbol: %w", errorNotTwoOperands)
+		}
+		num = num + string(input[*i])
+		*i++
+		if *i >= len(input) {
+			break
+		}
+	}
+	return num, nil
+}
+
 //use these errors as appropriate, wrapping them with fmt.Errorf function
 var (
 	// Use when the input is empty, and input is considered empty if the string contains only whitespace
@@ -30,7 +45,7 @@ func StringSum(input string) (output string, err error) {
 	var num string
 	cnt := 0
 	if len(input) == 0 {
-		return "", fmt.Errorf("error happened: %w", errorEmptyInput)
+		return "", fmt.Errorf("string is empty: %w", errorEmptyInput)
 	}
 	for i < len(input) {
 		if string(input[i]) == " " || string(input[i]) == "+" {
@@ -39,29 +54,15 @@ func StringSum(input string) (output string, err error) {
 			if string(input[i]) == "-" {
 				num = num + string("-")
 				i++
-				for string(input[i]) != " " && string(input[i]) != "-" && string(input[i]) != "+" {
-					_, err := strconv.Atoi(string(input[i]))
-					if err != nil {
-						return "", fmt.Errorf("error happened: %w", errorNotTwoOperands)
-					}
-					num = num + string(input[i])
-					i++
-					if i >= len(input) {
-						break
-					}
+				num, err = helper(&i, input, num)
+				if err != nil {
+					return "", err
 				}
 				cnt++
 			} else {
-				for string(input[i]) != " " && string(input[i]) != "-" && string(input[i]) != "+" {
-					_, err := strconv.Atoi(string(input[i]))
-					if err != nil {
-						return "", fmt.Errorf("error happened: %w", errorNotTwoOperands)
-					}
-					num = num + string(input[i])
-					i++
-					if i >= len(input) {
-						break
-					}
+				num, err = helper(&i, input, num)
+				if err != nil {
+					return "", err
 				}
 				cnt++
 			}
@@ -71,7 +72,7 @@ func StringSum(input string) (output string, err error) {
 		num = ""
 	}
 	if cnt != 2 {
-		return "", fmt.Errorf("error happened: %w", errorNotTwoOperands)
+		return "", fmt.Errorf("too many operands: %w", errorNotTwoOperands)
 	}
 	return strconv.Itoa(sum), nil
 }
