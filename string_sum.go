@@ -7,10 +7,17 @@ import (
 )
 
 func helper(i *int, input string, num string) (output string, err error) {
+	if string(input[*i]) == "-" {
+		num = num + string("-")
+		*i++
+		for string(input[*i]) == " " {
+			*i++
+		}
+	}
 	for string(input[*i]) != " " && string(input[*i]) != "-" && string(input[*i]) != "+" {
 		_, err := strconv.Atoi(string(input[*i]))
 		if err != nil {
-			return "", fmt.Errorf("Forbidden symbol: %w", errorNotTwoOperands)
+			return "", fmt.Errorf("forbidden symbol: %w", err)
 		}
 		num = num + string(input[*i])
 		*i++
@@ -51,21 +58,11 @@ func StringSum(input string) (output string, err error) {
 		if string(input[i]) == " " || string(input[i]) == "+" {
 			i++
 		} else {
-			if string(input[i]) == "-" {
-				num = num + string("-")
-				i++
-				num, err = helper(&i, input, num)
-				if err != nil {
-					return "", err
-				}
-				cnt++
-			} else {
-				num, err = helper(&i, input, num)
-				if err != nil {
-					return "", err
-				}
-				cnt++
+			num, err = helper(&i, input, num)
+			if err != nil {
+				return "", err
 			}
+			cnt++
 			int_num, _ := strconv.Atoi(num)
 			sum += int_num
 		}
